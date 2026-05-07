@@ -82,8 +82,9 @@ export default function Payment() {
       const success = Math.random() > 0.1;
 
       if (success) {
+        window.alert("¡Pedido realizado con éxito!");
         clearCart();
-        navigate('/confirmation', {
+        navigate('/', {
           state: {
             orderData: formData,
             total: finalTotal,
@@ -135,7 +136,7 @@ export default function Payment() {
                 <span className="font-medium">Tarjeta de crédito/débito</span>
               </label>
 
-              <div className="flex items-center gap-3 p-4 border-2 border-neutral-300 opacity-50">
+              {/* <div className="flex items-center gap-3 p-4 border-2 border-neutral-300 opacity-50">
                 <input
                   type="radio"
                   name="paymentMethod"
@@ -153,7 +154,7 @@ export default function Payment() {
                   className="w-5 h-5"
                 />
                 <span>Transferencia bancaria (No disponible en wireframe)</span>
-              </div>
+              </div> */}
             </div>
           </div>
 

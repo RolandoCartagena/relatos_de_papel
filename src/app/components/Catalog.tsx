@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Search, ShoppingCart, Filter, ShoppingBag } from 'lucide-react';
+//import { Search, ShoppingCart, Filter, ShoppingBag } from 'lucide-react';
+import { Search, Filter} from 'lucide-react';
 import { mockBooks } from '../data/books';
-import { useCart } from '../context/CartContext';
+//import { useCart } from '../context/CartContext';
 
 export default function Catalog() {
   const navigate = useNavigate();
-  const { cart } = useCart();
+  //const { cart } = useCart();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'physical' | 'digital'>('all');
 
@@ -17,57 +18,12 @@ export default function Catalog() {
     return matchesSearch && matchesFilter;
   });
 
-  const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  //const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="bg-card border-b-2 border-border">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-
-            <div className="flex items-center gap-4">
-              {/* Icono de Marca */}
-              <div className="relative">
-                <div className="bg-primary p-2 rounded-lg rotate-3 shadow-md">
-                  <ShoppingBag className="text-white" size={28} />
-                </div>
-                {/* Un pequeño adorno tipo "sello" */}
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-amber-600 rounded-full border-2 border-white"></div>
-              </div>
-
-              {/* Texto Identificador */}
-              <div className="flex flex-col">
-                <h1 className="text-2xl font-bold tracking-tighter text-primary leading-none">
-                  RELATOS <span className="font-light italic text-amber-900/70">de Papel</span>
-                </h1>
-                <div className="flex items-center gap-2">
-                  <span className="h-[1px] w-4 bg-amber-900/30"></span>
-                  <span className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 font-semibold">
-                    Librería & Objetos
-                  </span>
-                </div>
-              </div>
-            </div>
-
-
-            <button
-              onClick={() => navigate('/cart')}
-              className="relative px-6 py-3 bg-neutral-800 text-white border-2 border-neutral-900 hover:bg-neutral-700"
-            >
-              <div className="flex items-center gap-2">
-                <ShoppingCart size={20} />
-                <span>Carrito</span>
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-neutral-900 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">
-                    {cartItemCount}
-                  </span>
-                )}
-              </div>
-            </button>
-          </div>
-        </div>
-      </header>
+      
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Search and Filters */}
