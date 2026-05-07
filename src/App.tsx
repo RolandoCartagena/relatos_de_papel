@@ -13,6 +13,7 @@ import Confirmation from './app/components/Confirmation';
 import ErrorPage from './app/components/ErrorPage';
 import Login from './app/components/Login';
 import Navbar from './app/components/Navbar';
+import Footer from './app/components/Footer';
 import Profile from './app/components/Profile';
 
 export default function App() {
@@ -45,7 +46,7 @@ export default function App() {
               <Route path="*" element={<Navigate to="/error/404" replace />} />
             </Routes>
             </main>
-
+            <Footer/>
           </div>
         </CartProvider>
       </AuthProvider>

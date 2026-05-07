@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { Book, ShieldCheck, Truck, Star, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Truck, Star, ArrowRight } from 'lucide-react';
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ export default function Landing() {
             Donde cada página <br /> es un nuevo destino.
           </h1>
           <p className="text-neutral-600 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
-            Explora nuestra curada selección de literatura clásica y contemporánea. 
+            Explora nuestra magnífica selección de literatura clásica y contemporánea. 
             Desde ediciones físicas de colección hasta los últimos lanzamientos digitales.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -63,24 +63,13 @@ export default function Landing() {
             <div className="bg-neutral-100 w-12 h-12 flex items-center justify-center mb-6">
               <Star className="text-neutral-800" />
             </div>
-            <h3 className="font-serif font-bold text-xl mb-3">Calidad Curada</h3>
+            <h3 className="font-serif font-bold text-xl mb-3">Calidad Garantizada</h3>
             <p className="text-neutral-600 text-sm leading-relaxed">
-              Cada libro en nuestro catálogo ha sido seleccionado por nuestro equipo de expertos libreros.
+              Cada libro en nuestro catálogo ha sido seleccionado por nuestro equipo de expertos.
             </p>
           </div>
         </div>
       </section>
-
-      {/* Footer Simple para Landing */}
-      <footer className="py-12 border-t border-neutral-200 text-center">
-        <div className="flex justify-center items-center gap-2 mb-4 text-neutral-400">
-          <Book size={20} />
-          <span className="font-serif font-bold text-neutral-800">Relatos de Papel</span>
-        </div>
-        <p className="text-xs text-neutral-500 uppercase tracking-widest">
-          © 2026 Relatos de Papel - Todos los derechos reservados.
-        </p>
-      </footer>
     </div>
   );
 }

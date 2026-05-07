@@ -1,3 +1,7 @@
+import fotoRolando from '../../assets/images/male1.jpg';
+import fotoRocio from '../../assets/images/female.jpg';
+import fotoAndres from '../../assets/images/male2.jpg';
+
 export interface OrderItem {
   bookId: string;
   title: string;
@@ -36,7 +40,7 @@ export const mockUsers: UserProfile[] = [
     address: 'Colonia Escalón, Calle del Mirador',
     city: 'San Salvador',
     country: 'El Salvador',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rolando',
+    avatar: fotoRolando,
     orders: [
       {
         id: 'RC-001',
@@ -60,7 +64,7 @@ export const mockUsers: UserProfile[] = [
     address: 'Av. 6 de Agosto, Edificio Los Pinos',
     city: 'La Paz',
     country: 'Bolivia',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rocio',
+    avatar: fotoRocio,
     orders: [
       {
         id: 'RP-001',
@@ -84,7 +88,7 @@ export const mockUsers: UserProfile[] = [
     address: 'Calle La Mascota #456',
     city: 'San Salvador',
     country: 'El Salvador',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Andres',
+    avatar: fotoAndres,
     orders: [
         {
         id: 'ORD-9928',
