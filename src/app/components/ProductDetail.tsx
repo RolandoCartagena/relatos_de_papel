@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router';
 import { ArrowLeft, ShoppingCart, Plus, Minus } from 'lucide-react';
-import { mockBooks } from '../data/books';
+import { mockBooks } from '../data/mockBooks';
 import { useCart } from '../context/CartContext';
 import { useState } from 'react';
 

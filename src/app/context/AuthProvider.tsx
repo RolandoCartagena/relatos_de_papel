@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { type UserProfile, mockUsers } from '../data/userMocks';
+import { type UserProfile, mockUsers } from '../data/mockUsers';
 import { AuthContext } from './AuthContext';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

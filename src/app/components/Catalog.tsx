@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 //import { Search, ShoppingCart, Filter, ShoppingBag } from 'lucide-react';
 import { Search, Filter} from 'lucide-react';
-import { mockBooks } from '../data/books';
+import { mockBooks } from '../data/mockBooks';
 //import { useCart } from '../context/CartContext';
 
 export default function Catalog() {
