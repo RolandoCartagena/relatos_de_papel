@@ -3,18 +3,19 @@ import { CartProvider } from './app/context/CartContext';
 import { AuthProvider } from './app/context/AuthProvider';
 import ProtectedRoute from './app/components/ProtectedRoute';
 
-import Landing from './app/components/Landing';
-import Catalog from './app/components/Catalog';
-import ProductDetail from './app/components/ProductDetail';
-import Cart from './app/components/Cart';
-import Checkout from './app/components/Checkout';
-import Payment from './app/components/Payment';
-import Confirmation from './app/components/Confirmation';
-import ErrorPage from './app/components/ErrorPage';
-import Login from './app/components/Login';
 import Navbar from './app/components/Navbar';
 import Footer from './app/components/Footer';
-import Profile from './app/components/Profile';
+
+import Landing from './app/views/Landing';
+import Login from './app/views/Login';
+import Profile from './app/views/Profile';
+import Catalog from './app/views/Catalog';
+import ProductDetail from './app/views/ProductDetail';
+import Cart from './app/views/Cart';
+import Checkout from './app/views/Checkout';
+import Payment from './app/views/Payment';
+import Confirmation from './app/views/Confirmation';
+import ErrorPage from './app/views/ErrorPage';
 
 export default function App() {
   return (
