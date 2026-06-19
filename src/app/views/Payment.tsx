@@ -1,14 +1,20 @@
+// src/app/views/Payment.tsx
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router';
-import { ArrowLeft, CreditCard, Lock } from 'lucide-react';
+import { ArrowLeft, CreditCard, Lock, Loader2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../../hooks/useAuth';
+import { orderService } from '../../services/orderService';
 
 export default function Payment() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { clearCart } = useCart();
-  const { formData, finalTotal } = location.state || {};
-
+  const { clearCart, cart } = useCart();
+  const { user } = useAuth();
+  const { formData, finalTotal, userEmail, userId } = location.state || {};
+  
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [paymentData, setPaymentData] = useState({
     cardNumber: '',
     cardName: '',
@@ -17,7 +23,6 @@ export default function Payment() {
     saveCard: false
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [processing, setProcessing] = useState(false);
 
   if (!formData || !finalTotal) {
     navigate('/cart');
@@ -74,33 +79,52 @@ export default function Payment() {
       return;
     }
 
+    if (cart.length === 0) {
+      setError('El carrito está vacío');
+      return;
+    }
+
     setProcessing(true);
+    setError(null);
 
-    // Simulate payment processing
-    setTimeout(() => {
-      // Simulate 10% failure rate
-      const success = Math.random() > 0.1;
-
-      if (success) {
-        window.alert("¡Pedido realizado con éxito!");
-        clearCart();
-        navigate('/', {
-          state: {
-            orderData: formData,
-            total: finalTotal,
-            orderNumber: `ORD-${Date.now()}`
-          }
-        });
-      } else {
-        setProcessing(false);
-        navigate('/error/payment-failed');
-      }
-    }, 2000);
+    try {
+      console.log('💳 Procesando pago...');
+      
+      // ✅ Simular proceso de pago
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // ✅ Crear la orden en el backend para el primer libro del carrito
+      const firstBook = cart[0];
+      const orderData = {
+        userId: userId || user?.id || 'anonymous',
+        bookId: Number(firstBook.id) || 0,
+        totalPaid: finalTotal,
+        userEmail: userEmail || user?.email || formData.email  // ✅ Enviar email
+      };
+      
+      console.log('📦 Creando orden:', orderData);
+      const order = await orderService.createOrder(orderData);
+      console.log('✅ Orden creada:', order);
+      
+      // ✅ Limpiar carrito y navegar a confirmación
+      clearCart();
+      navigate('/confirmation', {
+        state: {
+          orderData: formData,
+          total: finalTotal,
+          orderNumber: order.id || `ORD-${Date.now()}`
+        }
+      });
+      
+    } catch (err: any) {
+      console.error('❌ Error en pago:', err);
+      setError(err.message || 'Error al procesar el pago. Por favor, intenta de nuevo.');
+      setProcessing(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-neutral-100">
-      {/* Header */}
       <header className="bg-white border-b-2 border-neutral-300">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <button
@@ -117,8 +141,13 @@ export default function Payment() {
       <div className="max-w-2xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-medium mb-8">PAGO SEGURO</h1>
 
+        {error && (
+          <div className="bg-red-50 border-2 border-red-500 p-4 mb-6 text-red-800">
+            <p>{error}</p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Payment Method Selection */}
           <div className="bg-white border-2 border-neutral-300 p-6">
             <h2 className="text-sm mb-4 pb-4 border-b-2 border-neutral-200">MÉTODO DE PAGO</h2>
 
@@ -135,30 +164,9 @@ export default function Payment() {
                 <CreditCard size={24} />
                 <span className="font-medium">Tarjeta de crédito/débito</span>
               </label>
-
-              {/* <div className="flex items-center gap-3 p-4 border-2 border-neutral-300 opacity-50">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  disabled
-                  className="w-5 h-5"
-                />
-                <span>PayPal (No disponible en wireframe)</span>
-              </div>
-
-              <div className="flex items-center gap-3 p-4 border-2 border-neutral-300 opacity-50">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  disabled
-                  className="w-5 h-5"
-                />
-                <span>Transferencia bancaria (No disponible en wireframe)</span>
-              </div> */}
             </div>
           </div>
 
-          {/* Card Details */}
           <div className="bg-white border-2 border-neutral-300 p-6">
             <h2 className="text-sm mb-4 pb-4 border-b-2 border-neutral-200">DATOS DE LA TARJETA</h2>
 
@@ -237,7 +245,6 @@ export default function Payment() {
             </div>
           </div>
 
-          {/* Order Summary */}
           <div className="bg-white border-2 border-neutral-300 p-6">
             <h2 className="text-sm mb-4 text-neutral-700">RESUMEN DEL PAGO</h2>
 
@@ -250,6 +257,10 @@ export default function Payment() {
                 <span className="text-neutral-600">Email:</span>
                 <span>{formData.email}</span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-neutral-600">Productos:</span>
+                <span>{cart.length} items</span>
+              </div>
             </div>
 
             <div className="flex justify-between text-2xl font-medium">
@@ -258,7 +269,6 @@ export default function Payment() {
             </div>
           </div>
 
-          {/* Security Notice */}
           <div className="bg-green-50 border-2 border-green-300 p-4 flex items-start gap-3">
             <Lock className="text-green-700 shrink-0 mt-1" size={20} />
             <div className="text-sm text-green-800">
@@ -267,13 +277,19 @@ export default function Payment() {
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={processing}
-            className="w-full px-6 py-4 bg-neutral-800 text-white border-2 border-neutral-900 hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-6 py-4 bg-neutral-800 text-white border-2 border-neutral-900 hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {processing ? 'PROCESANDO PAGO...' : `PAGAR $${finalTotal.toFixed(2)}`}
+            {processing ? (
+              <>
+                <Loader2 size={20} className="animate-spin" />
+                PROCESANDO PAGO...
+              </>
+            ) : (
+              `PAGAR $${finalTotal.toFixed(2)}`
+            )}
           </button>
 
           <p className="text-xs text-center text-neutral-600">

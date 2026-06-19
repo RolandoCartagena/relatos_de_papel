@@ -40,7 +40,6 @@ export default function Cart() {
 
   return (
     <div className="min-h-screen bg-neutral-100">
-      {/* Header */}
       <header className="bg-white border-b-2 border-neutral-300">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
@@ -58,7 +57,6 @@ export default function Cart() {
 
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="grid md:grid-cols-3 gap-6">
-          {/* Cart Items */}
           <div className="md:col-span-2 space-y-4">
             <div className="bg-white border-2 border-neutral-300 p-4">
               <h2 className="text-sm mb-4 text-neutral-700">PRODUCTOS ({cart.length})</h2>
@@ -67,24 +65,27 @@ export default function Cart() {
             {cart.map(item => (
               <div key={item.id} className="bg-white border-2 border-neutral-300 p-6">
                 <div className="flex gap-6">
-                  {/* Book Cover */}
                   <div className="w-20 h-28 bg-neutral-200 shrink-0 border border-neutral-300 overflow-hidden shadow-sm">
                     <img 
                       src={item.coverImage} 
                       alt={item.title}
                       className="w-full h-full object-cover"
                       loading="lazy"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/placeholder-book.jpg';
+                      }}
                     />
                   </div>
 
-                  {/* Book Info */}
                   <div className="grow">
                     <div className="flex justify-between mb-2">
                       <div>
                         <h3 className="font-medium mb-1 leading-tight">{item.title}</h3>
-                        <p className="text-sm text-neutral-600 mb-2">{item.author}</p>
+                        {/* ✅ Corregido: usar author.name en lugar de author */}
+                        <p className="text-sm text-neutral-600 mb-2">{item.author?.name || 'Autor desconocido'}</p>
                         <span className="px-2 py-1 text-[10px] font-bold border border-neutral-300 bg-neutral-50 uppercase tracking-wider">
-                          {item.type === 'physical' ? 'FÍSICO' : 'DIGITAL'}
+                          {item.type === 'Físico' ? 'FÍSICO' : 'DIGITAL'}
                         </span>
                       </div>
                       <button
@@ -96,7 +97,6 @@ export default function Cart() {
                       </button>
                     </div>
 
-                    {/* Quantity and Price */}
                     <div className="flex items-center justify-between mt-4 pt-4 border-t-2 border-neutral-100">
                       <div className="flex items-center gap-3">
                         <span className="text-sm text-neutral-600">Cantidad:</span>
@@ -133,7 +133,6 @@ export default function Cart() {
             ))}
           </div>
 
-          {/* Order Summary */}
           <div className="md:col-span-1">
             <div className="bg-white border-2 border-neutral-300 p-6 sticky top-4">
               <h2 className="text-sm mb-6 text-neutral-700">RESUMEN DEL PEDIDO</h2>

@@ -1,9 +1,8 @@
-// src/app/views/ProductDetail.tsx
-import { useNavigate, useParams } from 'react-router';
-import { ArrowLeft, ShoppingCart, Plus, Minus, Loader2 } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-import { useBook } from '../../hooks/useBook';
-import { useState } from 'react';
+import { useNavigate, useParams } from "react-router";
+import { ArrowLeft, ShoppingCart, Plus, Minus, Loader2 } from "lucide-react";
+import { useCart } from "../context/CartContext";
+import { useBook } from "../../hooks/useBook";
+import { useState, useRef, useEffect } from "react";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -13,28 +12,67 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [showMessage, setShowMessage] = useState(false);
 
-  const cartItem = cart.find(item => item.id === id);
+  // ✅ Estado para controlar el botón (visible en UI)
+  const [isAdding, setIsAdding] = useState(false); // ← Estado, no ref
+
+  // ✅ Ref para lógica interna (no visible en UI)
+  const isAddingRef = useRef(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const cartItem = cart.find((item) => item.id === id);
   const currentCartQuantity = cartItem?.quantity || 0;
   const maxQuantity = Math.max(0, (book?.stock || 0) - currentCartQuantity);
 
-  const handleAddToCart = () => {
-    if (!book) return;
-    if (book.stock === 0) {
-      navigate('/error/out-of-stock');
-      return;
-    }
-    for (let i = 0; i < quantity; i++) {
-      addToCart(book);
-    }
-    setShowMessage(true);
-    setTimeout(() => setShowMessage(false), 3000);
-  };
+const handleAddToCart = () => {
+  console.log('🔄 handleAddToCart llamado, isAddingRef.current:', isAddingRef.current);
+  
+  if (!book) return;
+  if (book.stock === 0) {
+    navigate('/error/out-of-stock');
+    return;
+  }
+
+  if (isAddingRef.current) {
+    console.log('⏳ Ya se está agregando, ignorando...');
+    return;
+  }
+
+  console.log('🛒 handleAddToCart ejecutado');
+  console.log('📦 Cantidad a agregar:', quantity);
+  console.log('📚 Libro:', book.title, 'ID:', book.id);
+  
+  isAddingRef.current = true;
+  setIsAdding(true);
+  
+  addToCart(book, quantity);
+  
+  setShowMessage(true);
+  
+  if (timeoutRef.current) {
+    clearTimeout(timeoutRef.current);
+  }
+  
+  timeoutRef.current = setTimeout(() => {
+    isAddingRef.current = false;
+    setIsAdding(false);
+    setShowMessage(false);
+  }, 2000);
+};
+
+  // ✅ Limpiar timeout al desmontar
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleRetry = () => {
     if (id) {
       reload(id);
     }
-  };  
+  };
 
   if (loading) {
     return (
@@ -48,16 +86,18 @@ export default function ProductDetail() {
     return (
       <div className="min-h-screen bg-neutral-100 flex items-center justify-center px-4">
         <div className="bg-white border-2 border-red-500 p-8 text-center">
-          <p className="text-red-600 mb-4">{error || 'Producto no encontrado'}</p>
+          <p className="text-red-600 mb-4">
+            {error || "Producto no encontrado"}
+          </p>
           <div className="flex gap-3 justify-center">
             <button
-              onClick={handleRetry}  // ✅ Usamos handleRetry en lugar de reload directamente
+              onClick={handleRetry} // ✅ Usamos handleRetry en lugar de reload directamente
               className="px-6 py-3 bg-neutral-800 text-white border-2 border-neutral-900 hover:bg-neutral-700"
             >
               REINTENTAR
             </button>
             <button
-              onClick={() => navigate('/catalog')}
+              onClick={() => navigate("/catalog")}
               className="px-6 py-3 border-2 border-neutral-300 hover:bg-neutral-100"
             >
               VOLVER AL CATÁLOGO
@@ -73,7 +113,7 @@ export default function ProductDetail() {
       <header className="bg-white border-b-2 border-neutral-300">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <button
-            onClick={() => navigate('/catalog')}
+            onClick={() => navigate("/catalog")}
             className="flex items-center gap-2 text-neutral-700 hover:text-neutral-900"
           >
             <ArrowLeft size={20} />
@@ -87,13 +127,13 @@ export default function ProductDetail() {
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <div className="w-full aspect-2/3 bg-neutral-200 flex items-center justify-center mb-4 shadow-xl border-2 border-neutral-300 overflow-hidden">
-                <img 
-                  src={book.coverImage} 
+                <img
+                  src={book.coverImage}
                   alt={book.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = '/placeholder-book.jpg';
+                    target.src = "/placeholder-book.jpg";
                   }}
                 />
               </div>
@@ -102,11 +142,13 @@ export default function ProductDetail() {
             <div className="space-y-6">
               <div>
                 <h1 className="text-3xl font-medium mb-2">{book.title}</h1>
-                <p className="text-xl text-neutral-600 mb-4">{book.author.name}</p>
+                <p className="text-xl text-neutral-600 mb-4">
+                  {book.author.name}
+                </p>
 
                 <div className="flex gap-2 mb-4">
                   <span className="px-3 py-1 text-sm border-2 border-neutral-300 bg-neutral-50">
-                    {book.type === 'Físico' ? 'LIBRO FÍSICO' : 'LIBRO DIGITAL'}
+                    {book.type === "Físico" ? "LIBRO FÍSICO" : "LIBRO DIGITAL"}
                   </span>
                   {book.stock > 0 ? (
                     <span className="px-3 py-1 text-sm border-2 border-green-600 bg-green-50 text-green-700">
@@ -119,11 +161,15 @@ export default function ProductDetail() {
                   )}
                 </div>
 
-                <div className="text-4xl font-medium mb-6">${book.price.toFixed(2)}</div>
+                <div className="text-4xl font-medium mb-6">
+                  ${book.price.toFixed(2)}
+                </div>
               </div>
 
               <div className="border-t-2 border-neutral-200 pt-6">
-                <h2 className="text-sm mb-3 text-neutral-700">DETALLES DEL PRODUCTO</h2>
+                <h2 className="text-sm mb-3 text-neutral-700">
+                  DETALLES DEL PRODUCTO
+                </h2>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-neutral-600">ISBN:</span>
@@ -147,7 +193,9 @@ export default function ProductDetail() {
 
               {book.stock > 0 && (
                 <div className="border-t-2 border-neutral-200 pt-6">
-                  <label className="block text-sm mb-3 text-neutral-700">CANTIDAD</label>
+                  <label className="block text-sm mb-3 text-neutral-700">
+                    CANTIDAD
+                  </label>
                   <div className="flex items-center gap-4">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -158,7 +206,9 @@ export default function ProductDetail() {
                     </button>
                     <span className="text-xl w-12 text-center">{quantity}</span>
                     <button
-                      onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
+                      onClick={() =>
+                        setQuantity(Math.min(maxQuantity, quantity + 1))
+                      }
                       className="w-10 h-10 border-2 border-neutral-300 hover:bg-neutral-100 flex items-center justify-center"
                       disabled={quantity >= maxQuantity}
                     >
@@ -174,14 +224,20 @@ export default function ProductDetail() {
               <div className="space-y-3">
                 <button
                   onClick={handleAddToCart}
-                  disabled={book.stock === 0 || maxQuantity === 0}
+                  disabled={book.stock === 0 || maxQuantity === 0 || isAdding} // ✅ Usar estado, no ref
                   className="w-full px-6 py-4 bg-neutral-800 text-white border-2 border-neutral-900 hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <ShoppingCart size={20} />
-                  <span>{book.stock === 0 ? 'SIN STOCK' : 'AÑADIR AL CARRITO'}</span>
+                  <span>
+                    {book.stock === 0
+                      ? "SIN STOCK"
+                      : isAdding
+                        ? "AGREGANDO..."
+                        : "AÑADIR AL CARRITO"}{" "}
+                  </span>
                 </button>
                 <button
-                  onClick={() => navigate('/cart')}
+                  onClick={() => navigate("/cart")}
                   className="w-full px-6 py-4 border-2 border-neutral-300 hover:bg-neutral-100"
                 >
                   IR AL CARRITO ({currentCartQuantity})

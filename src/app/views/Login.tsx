@@ -20,15 +20,20 @@ const handleSubmit = async (e: React.FormEvent) => {
   setLoading(true);
 
   try {
+    console.log('📡 Intentando login...');
     const success = await login(username, password);
+    console.log('✅ Login resultado:', success);
+    
     if (success) {
+      console.log('🚀 Redirigiendo a:', from);
       navigate(from, { replace: true });
     } else {
       setError('Credenciales incorrectas. Por favor, intenta de nuevo.');
     }
-  } catch {  // ✅ Sin parámetro
-  setError('Error al iniciar sesión. Por favor, intenta de nuevo.');
-} finally {
+  } catch (err) {
+    console.error('❌ Error en handleSubmit:', err);
+    setError('Error al iniciar sesión. Por favor, intenta de nuevo.');
+  } finally {
     setLoading(false);
   }
 };

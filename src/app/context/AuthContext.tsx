@@ -7,7 +7,7 @@ interface AuthContextType {
   loading: boolean;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
+  authError?: string | null;
 }
 
-// ✅ Solo exportamos el contexto, sin hooks
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);

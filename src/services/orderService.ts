@@ -3,6 +3,7 @@ import api from './api';
 export type Order = {
   id: number;
   userId: string;
+  userEmail?: string;  // ✅ Agregar email
   bookId: number;
   totalPaid: number;
   orderDate: string;
@@ -10,6 +11,7 @@ export type Order = {
 
 export type CreateOrderRequest = {
   userId: string;
+  userEmail?: string;  // ✅ Agregar email
   bookId: number;
   totalPaid: number;
 };

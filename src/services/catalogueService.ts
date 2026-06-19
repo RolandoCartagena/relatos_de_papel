@@ -1,6 +1,5 @@
 import api from './api';
 
-// ✅ Todos los tipos exportados con 'export type'
 export type Author = {
   author_id: number;
   name: string;
@@ -39,21 +38,44 @@ export type AIRecommendation = {
   justification: string;
 };
 
+// ✅ Función para generar la URL de la portada
+const getCoverUrl = (isbn: string): string => {
+  return `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`;
+};
+
+// ✅ Función para transformar un libro del backend al formato del frontend
+const transformBook = (book: Book): Book => {
+  return {
+    ...book,
+    coverImage: book.isbn ? getCoverUrl(book.isbn) : '/placeholder-book.jpg'
+  };
+};
+
 export const catalogueService = {
   getBooks: async (filters?: BookFilters): Promise<Book[]> => {
-    const params = new URLSearchParams();
+    let url = '/catalogue-service/books';
+
     if (filters) {
+      const params = new URLSearchParams();
       Object.entries(filters).forEach(([key, value]) => {
-        if (value) params.append(key, String(value));
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, String(value));
+        }
       });
+      const queryString = params.toString();
+      if (queryString) {
+        url = `/catalogue-service/books?${queryString}`;
+      }
     }
-    const response = await api.get(`/catalogue-service/books?${params.toString()}`);
-    return response.data;
+
+    console.log('📚 Fetching books from:', url);
+    const response = await api.get(url);
+    return response.data.map(transformBook);
   },
 
   getBookById: async (id: string): Promise<Book> => {
     const response = await api.get(`/catalogue-service/books/${id}`);
-    return response.data;
+    return transformBook(response.data);
   },
 
   getAIRecommendations: async (genre: string = 'Terror'): Promise<AIRecommendation[]> => {
@@ -63,17 +85,17 @@ export const catalogueService = {
 
   createBook: async (book: Omit<Book, 'id'>): Promise<Book> => {
     const response = await api.post('/catalogue-service/books', book);
-    return response.data;
+    return transformBook(response.data);
   },
 
   updateBook: async (id: string, book: Partial<Book>): Promise<Book> => {
     const response = await api.put(`/catalogue-service/books/${id}`, book);
-    return response.data;
+    return transformBook(response.data);
   },
 
   patchBook: async (id: string, book: Partial<Book>): Promise<Book> => {
     const response = await api.patch(`/catalogue-service/books/${id}`, book);
-    return response.data;
+    return transformBook(response.data);
   },
 
   deleteBook: async (id: string): Promise<void> => {
