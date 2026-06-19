@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router";
-import { CheckCircle2, Download, Mail, Package, Home } from "lucide-react";
+import { CheckCircle2, Package, Home } from "lucide-react";
 
 export default function Confirmation() {
   const navigate = useNavigate();

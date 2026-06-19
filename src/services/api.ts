@@ -33,7 +33,7 @@ api.interceptors.response.use(
     const isLoginRequest = error.config?.url?.includes('/auth/login');
     const isProfileRequest = error.config?.url?.includes('/users/profile');
     
-    if (error.response?.status === 401 && !isLoginRequest) {
+    if (error.response?.status === 401 && !isLoginRequest && !isProfileRequest) {
       console.warn('⚠️ 401 detectado en:', error.config?.url);
       // ✅ No eliminar token automáticamente - dejar que AuthProvider maneje
       // Solo redirigir si no estamos ya en login
