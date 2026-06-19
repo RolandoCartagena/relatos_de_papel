@@ -1,33 +1,52 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-//import { Search, ShoppingCart, Filter, ShoppingBag } from 'lucide-react';
-import { Search, Filter} from 'lucide-react';
-import { mockBooks } from '../data/mockBooks';
-//import { useCart } from '../context/CartContext';
+import { Search, Filter, Loader2, ShoppingBag } from 'lucide-react';
+import { useBooks } from '../../hooks/useBooks';
 
 export default function Catalog() {
   const navigate = useNavigate();
-  //const { cart } = useCart();
+  const { books, loading, error, reload } = useBooks();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'physical' | 'digital'>('all');
 
-  const filteredBooks = mockBooks.filter(book => {
+  const filteredBooks = books.filter(book => {
     const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         book.author.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterType === 'all' || book.type === filterType;
-    return matchesSearch && matchesFilter;
+                         book.author.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterType === 'all' || 
+                         (filterType === 'physical' && book.type === 'Físico') ||
+                         (filterType === 'digital' && book.type === 'Digital');
+    return matchesSearch && matchesFilter && book.visible;
   });
 
-  //const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-neutral-100 flex items-center justify-center">
+        <Loader2 size={48} className="animate-spin text-neutral-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-neutral-100 flex items-center justify-center px-4">
+        <div className="bg-white border-2 border-red-500 p-8 text-center max-w-md">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={reload}
+            className="px-6 py-3 bg-neutral-800 text-white border-2 border-neutral-900 hover:bg-neutral-700"
+          >
+            REINTENTAR
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
-      
-
+    <div className="min-h-screen bg-neutral-100">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Search and Filters */}
-        <div className="bg-card border-2 border-border p-6 mb-6">
+        <div className="bg-white border-2 border-neutral-300 p-6 mb-6">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm mb-2 text-neutral-700">BÚSQUEDA</label>
@@ -71,21 +90,26 @@ export default function Catalog() {
               onClick={() => navigate(`/product/${book.id}`)}
               className="bg-white border-2 border-neutral-300 p-4 hover:border-neutral-500 transition-colors text-left"
             >
-              {/* Book Cover Placeholder */}
               <div className="w-full aspect-2/3 bg-neutral-200 mb-4 overflow-hidden shadow-sm">
-                <div className="text-6xl text-neutral-400">
-                  <img src={book.coverImage} alt={book.title}className="w-full aspect-[2/3] object-cover mb-4 shadow-md"/>
-                </div>
+                <img 
+                  src={book.coverImage} 
+                  alt={book.title}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/placeholder-book.jpg';
+                  }}
+                />
               </div>
 
-              {/* Book Info */}
               <div className="space-y-2">
                 <h3 className="font-medium line-clamp-2 min-h-12">{book.title}</h3>
-                <p className="text-sm text-neutral-600">{book.author}</p>
+                <p className="text-sm text-neutral-600">{book.author.name}</p>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="px-2 py-1 text-xs border border-neutral-300 bg-neutral-50">
-                    {book.type === 'physical' ? 'FÍSICO' : 'DIGITAL'}
+                    {book.type === 'Físico' ? 'FÍSICO' : 'DIGITAL'}
                   </span>
                   {book.stock === 0 && (
                     <span className="px-2 py-1 text-xs border border-red-600 bg-red-50 text-red-700">
@@ -104,9 +128,7 @@ export default function Catalog() {
 
         {filteredBooks.length === 0 && (
           <div className="bg-white border-2 border-neutral-300 p-12 text-center">
-            <div className="text-neutral-400 mb-4">
-              <Search size={48} className="mx-auto" />
-            </div>
+            <ShoppingBag size={48} className="mx-auto text-neutral-400 mb-4" />
             <p className="text-neutral-600">No se encontraron libros que coincidan con tu búsqueda</p>
           </div>
         )}

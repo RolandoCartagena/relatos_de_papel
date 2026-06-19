@@ -1,10 +1,10 @@
-import { useContext } from 'react'; // Importar la herramienta de React
-import { AuthContext } from '../app/context/AuthContext'; // Importar el contexto que creaste
+import { useContext } from 'react';
+import { AuthContext } from '../app/context/AuthContext';
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
+  if (!context) {
+    throw new Error('useAuth debe usarse dentro de AuthProvider');
   }
   return context;
-};
+}

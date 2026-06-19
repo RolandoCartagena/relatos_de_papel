@@ -1,12 +1,13 @@
 import { createContext } from 'react';
-import type { UserProfile } from '../data/mockUsers';
+import type { UserProfile } from '../../services/authService';
 
 interface AuthContextType {
   user: UserProfile | null;
   isLoggedIn: boolean;
-  login: (email: string, password: string) => boolean;
+  loading: boolean;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
-// Exportamos solo el contexto aquí
+// ✅ Solo exportamos el contexto, sin hooks
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
