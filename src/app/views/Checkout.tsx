@@ -83,8 +83,11 @@ export default function Checkout() {
   // ✅ handleSubmit solo navega a Payment
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);  // ← Usar setLoading
     if (!validateForm()) return;
 
+      setError('Error'); // ← Usar setError
+  setLoading(false);
     // ✅ Navegar a Payment con los datos del formulario
     navigate("/payment", {
       state: {
